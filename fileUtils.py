@@ -48,3 +48,35 @@ class CsvManager():
         df = self.loadDataset()
         df.loc[len(df)] = values
         self.saveDataset(df=df)
+
+class ZipManager():
+    def __init__(self) -> None:
+        pass
+
+    def zipDir(self, newZipFilePath, dirPath, removePath=False):
+        shutil.make_archive(newZipFilePath, 'zip', dirPath)
+        if removePath:
+            shutil.rmtree(dirPath)
+
+    def unzipFile(self, zipFilePath, destinationDir, removeArchive=False):
+        with zipfile.ZipFile(zipFilePath, "r") as zip:
+            zip.extractall(destinationDir)
+        if removeArchive:
+            os.remove(zipFilePath)
+    
+    def removeFileFromZip(self, zipFilePath, tempDirPath, fileName):
+        if not os.path.exists(tempDirPath):
+            os.mkdir(tempDirPath)
+        self.unzipFile(zipFilePath=zipFilePath, destinationDir=tempDirPath, removeArchive=True)
+        for file in os.listdir(tempDirPath):
+            if file == fileName:
+                os.remove(os.path.join(tempDirPath, file))
+        self.zipDir(newZipFilePath=zipFilePath, dirPath=tempDirPath, removePath=True)
+    
+    def addFileToZip(self, zipFilePath, addFilePath):
+        with zipfile.ZipFile(zipFilePath, "a") as zip:
+            zip.write(addFilePath)
+
+    def getZipNameList(self, zipFilePath):
+        with zipfile.ZipFile(zipFilePath, 'r') as zip:
+            return zip.namelist()
