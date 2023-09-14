@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import zipfile
 import shutil
+import json
 
 class CsvManager():
     def __init__(self, csvFilePath, columns):
@@ -52,7 +53,7 @@ class CsvManager():
         self.saveDataset(df=df)
 
 class ZipManager():
-    def __init__(self) -> None:
+    def __init__(self):
         pass
 
     def zipDir(self, newZipFilePath, dirPath, removePath=False):
@@ -82,3 +83,55 @@ class ZipManager():
     def getZipNameList(self, zipFilePath):
         with zipfile.ZipFile(zipFilePath, 'r') as zip:
             return zip.namelist()
+
+class JsonManager():
+    def __init__(self):
+        pass
+
+    def loadJson(self, jsonPath):
+        with open(jsonPath, "r", encoding="utf8") as jsonFile: 
+            jsonDict = json.load(jsonFile)
+            return jsonDict
+    
+    def saveJson(self, jsonPath, jsonDict={}, indent=2):
+        with open(jsonPath, "w", encoding="utf8") as jsonFile:
+            json.dump(jsonDict, jsonFile, indent=indent)
+    
+    def getKeys(self, jsonPath):
+        jsonDict = self.loadJson(jsonPath)
+        return list(jsonDict.keys())
+    
+    def getValue(self, jsonPath, key):
+        jsonDict = self.loadJson(jsonPath)
+        return jsonDict[key]
+    
+    def getValues(self, jsonPath):
+        jsonDict = self.loadJson(jsonPath)
+        values = []
+        for key in self.getKeys(jsonPath):
+            values.append(jsonDict[key])
+        return values
+
+    def modifyValue(self, jsonPath, key, newValue):
+        jsonDict = self.loadJson(jsonPath)
+        jsonDict[key] = newValue
+        self.saveJson(jsonPath, jsonDict)
+    
+    def modifyValues(self, jsonPath, keyList, valueList):
+        jsonDict = self.loadJson(jsonPath)
+        for key, value in zip(keyList, valueList):
+            jsonDict[key] = value
+        self.saveJson(jsonPath, jsonDict)
+    
+    def removeValue(self, jsonPath, key):
+        jsonDict = self.loadJson(jsonPath)
+        jsonDict.pop(key)
+        self.saveJson(jsonPath, jsonDict)
+
+    def removeValues(self, jsonPath, keyList):
+        for key in keyList:
+            self.removeValue(jsonPath, key)
+
+#TESTING ONLY
+if __name__ == "__main__":
+    pass
