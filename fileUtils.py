@@ -131,7 +131,38 @@ class JsonManager():
     def removeValues(self, jsonPath, keyList):
         for key in keyList:
             self.removeValue(jsonPath, key)
+            
+class txtManager():
+    def __init__(self, debugMessage=False, encoding="utf8"):
+        self.debugMode = debugMessage
+        self.encoding = encoding
+    
+    def createEmpty(self, txtFilePath, overWrite=True):
+        if not overWrite:
+            if os.path.exists(txtFilePath):
+                return
+        with open(txtFilePath, "w", encoding=self.encoding):
+            pass
 
-#TESTING ONLY
-if __name__ == "__main__":
-    pass
+    def writeText(self, txtFilePath, text, append=False):
+        if append:
+            mode="a"
+        else:
+            mode="w"
+        with open(txtFilePath, mode, encoding=self.encoding) as f:
+            f.write(text)  
+    
+    def getText(self, txtFilePath):
+        with open(txtFilePath, "r", encoding=self.encoding) as f:
+            return f.read()
+    
+    def getLines(self, txtFilePath):
+        with open(txtFilePath, "r", encoding=self.encoding) as f:
+            return [line.strip() for line in f.readlines()]
+
+    def removeChar(self, txtFilePath, charToReplace, replaceChar="", saveFile=True):
+        fileText = self.getText(txtFilePath=txtFilePath)
+        fileText = fileText.replace(charToReplace, replaceChar)
+        if saveFile:
+            self.writeText(txtFilePath=txtFilePath, text=fileText)
+        return fileText  
